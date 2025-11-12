@@ -1,0 +1,59 @@
+name: Multi-Job Pipeline
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+  quality:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Flake8
+        run: flake8 app/ tests/
+      
+      - name: Check Black formatting
+        run: black --check .
+
+  tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=app --cov-report=xml:coverage.xml --html=report.html
+      
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            coverage.xml
+            report.html
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Deploy simulation
+        run: echo "🎉 Déploiement réussi ! Tous les tests passent."
