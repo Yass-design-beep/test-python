@@ -1,0 +1,31 @@
+name: Pytest Reports
+
+on: [push, pull_request]
+
+jobs:
+  reports:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-html
+    
+    - name: Run Pytest with reports
+      run: |
+        pytest --cov=app --cov-report=xml:coverage.xml --html=report.html
+    
+    - name: Upload reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: pytest-reports
+        path: |
+          coverage.xml
+          report.html
