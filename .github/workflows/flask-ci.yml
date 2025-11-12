@@ -21,4 +21,4 @@ jobs:
       - name: Run Flask tests
         env:
           FLASK_ENV: testing
-        run: pytest tests/ -v --cov=src --disable-warnings
+        run: python -m pytest tests/test_app.py -v --cov=app --disable-warnings

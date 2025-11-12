@@ -1,4 +1,10 @@
 import pytest
+import sys
+import os
+
+# Solution fiable pour les imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app.app import app
 
 
