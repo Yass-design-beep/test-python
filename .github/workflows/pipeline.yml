@@ -31,11 +31,12 @@ jobs:
         with:
           python-version: '3.12'
       
-      - name: Install linters
-        run: pip install flake8 black
+      - name: Install quality tools
+        run: |
+          pip install flake8 black
       
       - name: Run Flake8
-        run: flake8 app/ tests/
+        run: flake8 app/ tests/ --max-line-length=88 --extend-ignore=E203,W503
       
       - name: Check Black formatting
         run: black --check .
@@ -52,10 +53,10 @@ jobs:
         with:
           python-version: '3.12'
       
-      - name: Install dependencies
+      - name: Install test dependencies
         run: pip install -r requirements.txt
       
-      - name: Run tests with coverage
+      - name: Run tests
         run: |
           pytest --cov=app --cov-report=xml:coverage.xml --html=report.html
       
@@ -67,10 +68,13 @@ jobs:
             coverage.xml
             report.html
 
-  deploy:
-    needs: tests
+  success:
+    needs: [quality, tests]
     runs-on: ubuntu-latest
-    if: success()
+    if: always()
     steps:
-      - name: Deploy simulation
-        run: echo "🎉 Déploiement réussi ! Tous les tests passent."
+      - name: All checks completed
+        run: |
+          echo "✅ Tous les jobs sont terminés"
+          echo "Quality: ${{ needs.quality.result }}"
+          echo "Tests: ${{ needs.tests.result }}"
