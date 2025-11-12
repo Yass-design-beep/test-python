@@ -3,3 +3,5 @@ flask
 pytest
 pytest-cov
 pytest-html
+flake8
+black
